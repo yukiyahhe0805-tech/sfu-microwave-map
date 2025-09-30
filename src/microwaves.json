@@ -1,0 +1,16 @@
+[
+  {
+    "building": "Maggie Benston Centre",
+    "location": "2nd floor near Tim Hortons",
+    "hours": "Mon–Fri 7:30am–9:00pm",
+    "lat": 49.2795,
+    "lng": -122.9219
+  },
+  {
+    "building": "Academic Quadrangle",
+    "location": "Courtyard area",
+    "hours": "24/7",
+    "lat": 49.2786,
+    "lng": -122.9202
+  }
+]
