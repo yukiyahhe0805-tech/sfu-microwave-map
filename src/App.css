@@ -1,46 +1,25 @@
+/* Reset + Fullscreen layout */
+html, body, #root {
+    height: 100%;
+    width: 100%;       /* fill full width */
+    margin: 0;
+    padding: 0;
+}
+
+/* Remove any max-width centering */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Leaflet map container */
+.leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
+/* Header on map */
 .map-header {
     position: absolute;
     top: 10px;
@@ -55,7 +34,28 @@
     z-index: 1000;
 }
 
-/* Pulsing blue dot (like Google Maps) */
+/* Floating button */
+.floating-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: #d22630;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 1000;
+    transition: background 0.2s ease;
+}
+
+.floating-btn:hover {
+    background: #b51e27;
+}
+
+/* Pulsing dot */
 .leaflet-pulsing-dot {
     width: 18px;
     height: 18px;
