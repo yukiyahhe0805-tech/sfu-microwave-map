@@ -1,85 +1,96 @@
-import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet'
 import { useState, useEffect } from 'react'
 import microwaves from './microwaves.json'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import './App.css'   // ✅ styles live in App.css
 
-// Fix default Leaflet icons (for microwave markers)
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+// Custom microwave icon (make sure microwave.png is in /public)
+const microwaveIcon = new L.Icon({
+    iconUrl: '/microwave.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -28],
+})
+
+// Pulsing dot icon for user location
+const userIcon = L.divIcon({
+    className: "leaflet-pulsing-dot",
+    iconSize: [18, 18]
 })
 
 export default function MapView() {
     const [position, setPosition] = useState(null)
     const [accuracy, setAccuracy] = useState(null)
 
-    // Track location continuously
+    // Track user location
     useEffect(() => {
         if (navigator.geolocation) {
             const watchId = navigator.geolocation.watchPosition(
                 (pos) => {
                     setPosition([pos.coords.latitude, pos.coords.longitude])
-                    setAccuracy(pos.coords.accuracy) // meters
+                    setAccuracy(pos.coords.accuracy)
                 },
-                (err) => {
-                    console.error(err)
-                },
+                (err) => console.error(err),
                 { enableHighAccuracy: true }
             )
-
             return () => navigator.geolocation.clearWatch(watchId)
         }
     }, [])
 
     return (
-        <MapContainer
-            center={[49.2781, -122.9197]}  // fallback center: SFU Burnaby
-            zoom={16}
-            style={{ height: "100vh", width: "100%" }}
-        >
-            <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            />
+        <div style={{ position: "relative", height: "100vh", width: "100%" }}>
 
-            {/* Microwave markers from JSON */}
-            {microwaves.map((m, i) => (
-                <Marker key={i} position={[m.lat, m.lng]}>
-                    <Popup>
-                        <b>{m.building}</b><br />
-                        {m.location}<br />
-                        {m.hours}
-                    </Popup>
-                </Marker>
-            ))}
+            {/* App Header */}
+            <div className="map-header">
+                SFU Microwave Map
+            </div>
 
-            {/* Current location as blue dot + accuracy circle */}
-            {position && (
-                <>
-                    <CircleMarker
-                        center={position}
-                        radius={8}           // size of blue dot
-                        color="blue"
-                        fillColor="blue"
-                        fillOpacity={0.9}
-                    >
-                        <Popup>📍 You are here</Popup>
-                    </CircleMarker>
+            <MapContainer
+                center={[49.2781, -122.9197]} // fallback center: SFU Burnaby
+                zoom={16}
+                style={{ height: "100%", width: "100%" }}
+            >
+                {/* Clean Carto light basemap */}
+                <TileLayer
+                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+                    subdomains="abcd"
+                    maxZoom={20}
+                />
 
-                    {accuracy && (
-                        <Circle
-                            center={position}
-                            radius={accuracy}   // meters
-                            color="blue"
-                            fillColor="blue"
-                            fillOpacity={0.15}
-                        />
-                    )}
-                </>
-            )}
-        </MapContainer>
+                {/* Microwave markers */}
+                {microwaves.map((m, i) => (
+                    <Marker key={i} position={[m.lat, m.lng]} icon={microwaveIcon}>
+                        <Popup>
+                            <div style={{ fontSize: "14px", lineHeight: "1.4" }}>
+                                <b style={{ color: "#d22630" }}>{m.building}</b><br />
+                                📍 {m.location}<br />
+                                ⏰ {m.hours || "Hours not listed"}
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+
+                {/* User location (pulsing dot + accuracy circle) */}
+                {position && (
+                    <>
+                        <Marker position={position} icon={userIcon}>
+                            <Popup>📍 You are here</Popup>
+                        </Marker>
+
+                        {accuracy && (
+                            <Circle
+                                center={position}
+                                radius={accuracy}
+                                color="blue"
+                                fillColor="blue"
+                                fillOpacity={0.15}
+                            />
+                        )}
+                    </>
+                )}
+            </MapContainer>
+        </div>
     )
 }
